@@ -10,11 +10,15 @@ Proyecto Flutter con Firebase Auth + Google Sign-In
 
 ## Pasos para correr
 
-```git clone https://github.com/EL_LINK```
-```cd finbrain```
+```cmd
+git clone https://github.com/JosueDJ20212015/finbrain.git
+cd finbrain;
+```
 
-```flutter pub get```
-```flutter run```
+```cmd
+flutter pub get
+flutter run
+```
 
 ## IMPORTANTE
 
