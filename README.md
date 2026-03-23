@@ -12,7 +12,7 @@ Proyecto Flutter con Firebase Auth + Google Sign-In
 
 ```cmd
 git clone https://github.com/JosueDJ20212015/finbrain.git
-cd finbrain;
+cd finbrain
 ```
 
 ```cmd
@@ -26,6 +26,8 @@ Cada miembro debe agregar su SHA1 en Firebase
 
 Comando para obtener SHA1 desde la terminal de windows:
 
-```keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android```
+```cmd
+keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android
+```
 
 Luego agregar en Firebase → Project settings → Android → Add SHA1
