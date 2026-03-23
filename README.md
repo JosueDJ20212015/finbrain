@@ -1,16 +1,27 @@
-# myapp
+# finBrain
 
-A new Flutter project.
+Proyecto Flutter con Firebase Auth + Google Sign-In
 
-## Getting Started
+## Requisitos
 
-This project is a starting point for a Flutter application.
+- Flutter instalado
+- Android Studio instalado
+- Cuenta Firebase configurada
 
-A few resources to get you started if this is your first Flutter project:
+## Pasos para correr
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```git clone https://github.com/EL_LINK```
+```cd finbrain```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```flutter pub get```
+```flutter run```
+
+## IMPORTANTE
+
+Cada miembro debe agregar su SHA1 en Firebase
+
+Comando para obtener SHA1 desde la terminal de windows:
+
+```keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android```
+
+Luego agregar en Firebase → Project settings → Android → Add SHA1
