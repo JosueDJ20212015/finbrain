@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "599863726213",
+    "project_id": "finbrain-80f71",
+    "storage_bucket": "finbrain-80f71.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599863726213:android:74cc387fb3b7acc5a5d9ec",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599863726213-88haj4otr9km1631k3a2q7pq6pmvoph5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapp",
+            "certificate_hash": "feaaf7ad1e8eebdbbd431b862a5e9a57e0068752"
+          }
+        },
+        {
+          "client_id": "599863726213-jk89cdhsd7um7n786udkptos9pl5p8h5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0V9f_Y6Sd4Ke3j4IcHfnMXjOSYJi7gBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599863726213-jk89cdhsd7um7n786udkptos9pl5p8h5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "599863726213-bsgvd2roniqfrd33mv83rnp9lcknmb45.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
