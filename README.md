@@ -1,4 +1,4 @@
-# finBrain
+# 🧠💲 finBrain
 
 Proyecto Flutter con Firebase Auth + Google Sign-In
 
