@@ -31,7 +31,9 @@ class AuthService {
   Future<UserCredential> signInWithGoogle() async {
     final GoogleSignIn signIn = GoogleSignIn.instance;
 
-    await signIn.initialize();
+    await signIn.initialize(
+      serverClientId: '599863726213-jk89cdhsd7um7n786udkptos9pl5p8h5.apps.googleusercontent.com',
+    );
 
     final GoogleSignInAccount googleUser = await signIn.authenticate();
 
@@ -48,7 +50,7 @@ class AuthService {
     await auth.signOut();
 
     try {
-      await GoogleSignIn.instance.disconnect();
+      await GoogleSignIn.instance.signOut();
     } catch (_) {}
   }
 }

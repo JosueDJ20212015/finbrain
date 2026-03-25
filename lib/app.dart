@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
-import 'views/home_view.dart';
+import 'services/tarjeta_service.dart';
+import 'views/main_shell.dart';
 import 'views/login_view.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,33 +13,31 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = AuthService();
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'finBrain',
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Inter',
-      ),
-      home: StreamBuilder<User?>(
-        stream: authService.authStateChanges,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF101722),
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF35D6C8),
+    return ChangeNotifierProvider(
+      create: (_) => TarjetaService(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'finBrain',
+        theme: ThemeData(useMaterial3: true, fontFamily: 'Inter'),
+        home: StreamBuilder<User?>(
+          stream: authService.authStateChanges,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                backgroundColor: Color(0xFF101722),
+                body: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF35D6C8)),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          if (snapshot.hasData) {
-            return HomeView();
-          }
+            if (snapshot.hasData) {
+              return const MainShell();
+            }
 
-          return const LoginView();
-        },
+            return const LoginView();
+          },
+        ),
       ),
     );
   }

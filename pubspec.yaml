@@ -38,6 +38,8 @@ dependencies:
   firebase_auth: ^6.2.0
   google_sign_in: ^7.2.0
   top_snackbar_flutter: ^3.3.0
+  cloud_firestore: ^6.2.0
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:

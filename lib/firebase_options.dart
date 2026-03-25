@@ -62,6 +62,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '599863726213',
     projectId: 'finbrain-80f71',
     storageBucket: 'finbrain-80f71.firebasestorage.app',
+    androidClientId: '599863726213-88haj4otr9km1631k3a2q7pq6pmvoph5.apps.googleusercontent.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
