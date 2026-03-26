@@ -1,8 +1,8 @@
 class TarjetaModel {
   final String id;
   final String banco;
-  final String tipo; // 'credito' | 'debito'
-  final String redTarjeta; // 'visa' | 'mastercard' | 'amex'
+  final String tipo; // credito o debito
+  final String redTarjeta; // visa, mastercard, amex, etc.
   final String titular;
   final String ultimos4;
   final String mesVencimiento;
@@ -11,8 +11,8 @@ class TarjetaModel {
   final String cvv;
   final int colorTarjeta; // Color ARGB como int
   final double? limiteCredito;
-  final int? diaCorte; // 1–31
-  final int? diaPago; // 1–31
+  final int? diaCorte; 
+  final int? diaPago; 
   final DateTime creadaEn;
 
   TarjetaModel({

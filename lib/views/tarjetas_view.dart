@@ -37,25 +37,7 @@ class TarjetasView extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => _irAgregarTarjeta(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: _colorAcento.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _colorAcento.withOpacity(0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.add_rounded,
-                        color: _colorAcento,
-                        size: 22,
-                      ),
-                    ),
-                  ),
+                
                 ],
               ),
             ),

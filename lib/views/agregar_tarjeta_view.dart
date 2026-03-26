@@ -124,7 +124,7 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           children: [
-            // ── Vista previa en tiempo real ───────────────────────────────
+            // ── Vista previa en tiempo real 
             AnimatedBuilder(
               animation: Listenable.merge([
                 _bancoCtrl,
@@ -229,7 +229,7 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
             CampoTextoTarjeta(
               controlador: _limiteCtrl,
               etiqueta: 'Límite de crédito (opcional)',
-              icono: Icons.account_balance_wallet_rounded,
+              icono: Icons.money_rounded,
               teclado: TextInputType.number,
               validador: (v) {
                 if (v == null || v.isEmpty) return null;
@@ -239,8 +239,6 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
                 return null;
               },
             ),
-            const SizedBox(height: 14),
-
             Row(
               children: [
                 Expanded(

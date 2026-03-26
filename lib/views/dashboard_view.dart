@@ -190,7 +190,6 @@ class DashboardView extends StatelessWidget {
   }
 }
 
-// ─── Widgets auxiliares ────────────────────────────────────────────────────────
 
 class _TituloSeccion extends StatelessWidget {
   final String titulo;

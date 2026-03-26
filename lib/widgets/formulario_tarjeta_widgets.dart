@@ -562,61 +562,94 @@ class SelectorDiaTarjeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A2535),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A3A50), width: 1),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int?>(
-          value: valor,
-          isExpanded: true,
-          dropdownColor: const Color(0xFF1A2535),
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Color(0xFF8899AA),
-          ),
-          hint: Row(
-            children: [
-              Icon(icono, color: const Color(0xFF35D6C8), size: 18),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  etiqueta,
-                  style: const TextStyle(
-                    color: Color(0xFF8899AA),
-                    fontSize: 12,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          items: [
-            const DropdownMenuItem<int?>(
-              value: null,
-              child: Text('—', style: TextStyle(color: Color(0xFF8899AA))),
-            ),
-            ...List.generate(31, (i) => i + 1).map(
-              (dia) => DropdownMenuItem<int?>(
-                value: dia,
-                child: Text(
-                  'Día $dia',
-                  style:
-                      const TextStyle(color: Colors.white, fontSize: 13),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: valor != null ? 1.0 : 0.0,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 5),
+            child: Text(
+              etiqueta,
+              style: const TextStyle(
+                color: Color(0xFF35D6C8),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
-          onChanged: alCambiar,
+          ),
         ),
-      ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A2535),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              // El borde cambia de color si está seleccionado
+              color: valor != null ? const Color(0xFF35D6C8).withOpacity(0.5) : const Color(0xFF2A3A50), 
+              width: 1,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int?>(
+              value: valor,
+              isExpanded: true,
+              dropdownColor: const Color(0xFF1A2535),
+              icon: const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: Color(0xFF8899AA),
+              ),
+              // Lo que se muestra cuando NO hay selección
+              hint: Row(
+                children: [
+                  Icon(icono, color: const Color(0xFF35D6C8), size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    etiqueta,
+                    style: const TextStyle(color: Color(0xFF8899AA), fontSize: 13),
+                  ),
+                ],
+              ),
+              // Lo que se muestra cuando SÍ hay selección
+              selectedItemBuilder: (BuildContext context) {
+                return [
+                  ...List.generate(32, (index) => index).map((_) => Row(
+                    children: [
+                      Icon(icono, color: const Color(0xFF35D6C8), size: 18),
+                      const SizedBox(width: 8),
+                      Text( valor == null ? etiqueta : 'Día $valor',
+                      style: TextStyle(
+                      color: valor == null ? const Color(0xFF8899AA) : Colors.white, 
+                      fontSize: 14,),
+                      ),
+                    ],
+                  ))
+                ];
+              },
+              items: [
+                const DropdownMenuItem<int?>(
+                  value: null,
+                  child: Text('Sin seleccionar', style: TextStyle(color: Color(0xFF8899AA))),
+                ),
+                ...List.generate(31, (i) => i + 1).map(
+                  (dia) => DropdownMenuItem<int?>(
+                    value: dia,
+                    child: Text(
+                      'Día $dia',
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: alCambiar,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
-
 // ─── Constantes de colores disponibles ────────────────────────────────────────
 const List<int> coloresDisponiblesTarjeta = [
   0xFF1A237E,

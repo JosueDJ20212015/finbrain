@@ -109,7 +109,7 @@ class _MainShellState extends State<MainShell> {
                   colorInactivo: _colorInactivo,
                   alTocar: () => setState(() => _paginaActual = 0),
                 ),
-                _BotonNav(
+                 _BotonNav(
                   icono: Icons.credit_card_rounded,
                   etiqueta: 'Tarjetas',
                   activo: _paginaActual == 1,
