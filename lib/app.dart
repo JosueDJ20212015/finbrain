@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import 'services/auth_service.dart';
+import 'utils/app_colors.dart';
 import 'views/home_view.dart';
 import 'views/login_view.dart';
 
@@ -17,16 +19,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Inter',
+        scaffoldBackgroundColor: AppColors.background,
       ),
       home: StreamBuilder<User?>(
         stream: authService.authStateChanges,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-              backgroundColor: Color(0xFF101722),
+              backgroundColor: AppColors.background,
               body: Center(
                 child: CircularProgressIndicator(
-                  color: Color(0xFF35D6C8),
+                  color: AppColors.primary,
                 ),
               ),
             );
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
             return HomeView();
           }
 
-          return const LoginView();
+          return LoginView();
         },
       ),
     );

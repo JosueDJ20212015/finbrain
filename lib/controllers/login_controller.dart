@@ -24,7 +24,7 @@ class LoginController {
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      return 'Completa correo y contraseña.';
+      return 'Completar correo y contraseña';
     }
 
     try {
@@ -40,20 +40,20 @@ class LoginController {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-email':
-          return 'El correo no es válido.';
+          return 'El correo no es valido';
         case 'invalid-credential':
-          return 'Correo o contraseña incorrectos.';
+          return 'Correo o contraseña incorrectos';
         case 'user-not-found':
-          return 'No existe una cuenta con ese correo.';
+          return 'No existe una cuenta con ese correo';
         case 'wrong-password':
-          return 'La contraseña es incorrecta.';
+          return 'La contraseña es incorrecta';
         case 'user-disabled':
-          return 'Esta cuenta fue deshabilitada.';
+          return 'Esta cuenta fue deshabilitada';
         default:
-          return 'No se pudo iniciar sesión.';
+          return 'No se pudo iniciar sesión';
       }
     } catch (_) {
-      return 'No se pudo iniciar sesión.';
+      return 'No se pudo iniciar sesion';
     } finally {
       isLoading = false;
       refreshUi();
@@ -74,9 +74,9 @@ class LoginController {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'google-sign-in-cancelled':
-          return 'Se canceló el inicio de sesión con Google.';
+          return 'Se canceló el inicio de sesion con Google.';
         case 'account-exists-with-different-credential':
-          return 'Ya existe una cuenta con ese correo usando otro método.';
+          return 'Ya existe una cuenta con ese correo';
         case 'invalid-credential':
           return 'La credencial de Google no es válida.';
         default:

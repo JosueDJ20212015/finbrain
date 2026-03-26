@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:myapp/utils/app_snackbar.dart';
+
 import '../controllers/login_controller.dart';
 import '../widgets/animated_login_background.dart';
 import '../widgets/custom_text_field.dart';
@@ -65,34 +67,34 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
   }
 
   Future<void> handleEmailLogin() async {
-  final message = await loginController.onEmailLogin(
-    context: context,
-    refreshUi: () {
-      setState(() {});
-    },
-  );
+    final message = await loginController.onEmailLogin(
+      context: context,
+      refreshUi: () {
+        setState(() {});
+      },
+    );
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  if (message != null) {
-    AppSnackbar.error(context, message);
+    if (message != null) {
+      AppSnackbar.error(context, message);
+    }
   }
-}
 
   Future<void> handleGoogleLogin() async {
-  final message = await loginController.onGoogleLogin(
-    context: context,
-    refreshUi: () {
-      setState(() {});
-    },
-  );
+    final message = await loginController.onGoogleLogin(
+      context: context,
+      refreshUi: () {
+        setState(() {});
+      },
+    );
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  if (message != null) {
-    AppSnackbar.error(context, message);
+    if (message != null) {
+      AppSnackbar.error(context, message);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -122,32 +124,61 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text.rich(
-                            const TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'fin',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 42,
+                                height: 42,
+                                padding: const EdgeInsets.all(4),
+                                /*decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.white.withOpacity(0.04),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.08),
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF35D6C8).withOpacity(0.18),
+                                      blurRadius: 18,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),*/
+                                child: SvgPicture.asset(
+                                  'assets/icons/brainIcon.svg',
+                                  fit: BoxFit.contain,
                                 ),
-                                TextSpan(
-                                  text: 'Brain',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text.rich(
+                                const TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'fin',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Brain',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            style: const TextStyle(
-                              fontSize: 38,
-                              color: Colors.white,
-                              letterSpacing: -1.0,
-                            ),
+                                style: const TextStyle(
+                                  fontSize: 38,
+                                  color: Colors.white,
+                                  letterSpacing: -1.0,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Welcome',
+                            'Bienvenido',
                             style: TextStyle(
                               fontSize: 40,
                               height: 1.5,
@@ -157,16 +188,16 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                           const SizedBox(height: 10),
                           CustomTextField(
                             controller: loginController.emailController,
-                            label: 'Email Address',
-                            hintText: 'Enter your email...',
+                            label: 'Correo',
+                            hintText: 'Ingresar tu correo...',
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.mail_outline_rounded,
                           ),
                           const SizedBox(height: 20),
                           CustomTextField(
                             controller: loginController.passwordController,
-                            label: 'Password',
-                            hintText: 'Enter your password...',
+                            label: 'Contraseña',
+                            hintText: 'Ingresar contraseña...',
                             obscureText: loginController.obscurePassword,
                             prefixIcon: Icons.lock_outline_rounded,
                             suffixIcon: IconButton(
@@ -195,7 +226,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: const Text(
-                                'Forgot password?',
+                                'Olvidaste tu contraseña?',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -229,7 +260,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       ),
                                     )
                                   : const Text(
-                                      'Sign In',
+                                      'Iniciar sesión',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w800,
@@ -251,7 +282,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   horizontal: 12,
                                 ),
                                 child: Text(
-                                  'or continue with',
+                                  'o continuar con',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.55),
                                     fontSize: 12,
@@ -280,9 +311,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   color: Colors.white.withOpacity(0.12),
                                   width: 1.2,
                                 ),
-                                backgroundColor: const Color(
-                                  0xFF131C27,
-                                ).withOpacity(0.72),
+                                backgroundColor: const Color(0xFF131C27).withOpacity(0.72),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18),
                                 ),
@@ -309,7 +338,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   ),
                                   const SizedBox(width: 12),
                                   const Text(
-                                    'Continue with Google',
+                                    'Continuar con Google',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15,
@@ -326,7 +355,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Don't have an account? ",
+                                  'No tienes una cuenta? ',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.58),
                                     fontSize: 13,
@@ -345,11 +374,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                     foregroundColor: const Color(0xFF8FE9DD),
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(0, 0),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   child: const Text(
-                                    'Create one',
+                                    'Crear',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
