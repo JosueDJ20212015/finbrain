@@ -148,7 +148,16 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
             const SizedBox(height: 10),
             SelectorTipoTarjeta(
               seleccionado: _tipo,
-              alCambiar: (v) => setState(() => _tipo = v),
+              alCambiar: (v){
+                setState(() {
+                  _tipo = v;
+                  if (_tipo == 'debito') {
+                    _diaCorte = null;
+                    _diaPago = null;
+                  }
+                });
+
+              } 
             ),
 
             const SizedBox(height: 20),
@@ -239,27 +248,28 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
                 return null;
               },
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: SelectorDiaTarjeta(
-                    etiqueta: 'Día de corte',
-                    icono: Icons.calendar_today_rounded,
-                    valor: _diaCorte,
-                    alCambiar: (d) => setState(() => _diaCorte = d),
+           if (_tipo == 'credito') 
+              Row(
+                children: [
+                  Expanded(
+                    child: SelectorDiaTarjeta(
+                      etiqueta: 'Día de corte',
+                      icono: Icons.calendar_today_rounded,
+                      valor: _diaCorte,
+                      alCambiar: (d) => setState(() => _diaCorte = d),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SelectorDiaTarjeta(
-                    etiqueta: 'Día de pago',
-                    icono: Icons.payments_rounded,
-                    valor: _diaPago,
-                    alCambiar: (d) => setState(() => _diaPago = d),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SelectorDiaTarjeta(
+                      etiqueta: 'Día de pago',
+                      icono: Icons.payments_rounded,
+                      valor: _diaPago,
+                      alCambiar: (d) => setState(() => _diaPago = d),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
             const SizedBox(height: 32),
 

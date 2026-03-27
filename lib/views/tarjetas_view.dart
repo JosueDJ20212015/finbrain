@@ -18,6 +18,7 @@ class TarjetasView extends StatelessWidget {
     final tarjetas = tarjetaService.tarjetas;
 
     return Scaffold(
+      floatingActionButtonLocation: .endTop,
       backgroundColor: _colorFondo,
       body: SafeArea(
         child: Column(
@@ -80,16 +81,16 @@ class TarjetasView extends StatelessWidget {
         ),
       ),
 
-      // Botón flotante
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _irAgregarTarjeta(context),
-        backgroundColor: _colorAcento,
-        icon: const Icon(Icons.add_card_rounded, color: Colors.black87),
-        label: const Text(
-          'Agregar tarjeta',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
-        ),
-      ),
+      floatingActionButton: FloatingActionButton(
+  onPressed: () => _irAgregarTarjeta(context),
+  backgroundColor: _colorAcento,
+  child: const Icon(
+    Icons.add_card_rounded,
+    color: Colors.black87,
+  ),
+),
+
+      
     );
   }
 
