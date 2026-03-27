@@ -21,7 +21,6 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
   late final TextEditingController _titularCtrl;
   late final TextEditingController _numeroCtrl;
   late final TextEditingController _vencimientoCtrl;
-  late final TextEditingController _cvvCtrl;
   late final TextEditingController _limiteCtrl;
 
   late String _tipo;
@@ -40,7 +39,6 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
     _numeroCtrl = TextEditingController(text: t.ultimos4);
     _vencimientoCtrl =
         TextEditingController(text: '${t.mesVencimiento}/${t.anioVencimiento}');
-    _cvvCtrl = TextEditingController(text: t.cvv);
     _limiteCtrl = TextEditingController(
       text: t.limiteCredito != null ? t.limiteCredito!.toStringAsFixed(0) : '',
     );
@@ -57,7 +55,6 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
     _titularCtrl.dispose();
     _numeroCtrl.dispose();
     _vencimientoCtrl.dispose();
-    _cvvCtrl.dispose();
     _limiteCtrl.dispose();
     super.dispose();
   }
@@ -85,22 +82,19 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
     if (!_claveFormulario.currentState!.validate()) return;
     setState(() => _guardando = true);
 
-    final numero = _numeroCtrl.text.replaceAll(' ', '');
-    final ultimos4 = numero.length >= 4
-        ? numero.substring(numero.length - 4)
-        : widget.tarjeta.ultimos4;
+    //final numero = _numeroCtrl.text.replaceAll(' ', '');
+    final ultimos4 = widget.tarjeta.ultimos4;
     final partes = _vencimientoCtrl.text.split('/');
 
     final tarjetaActualizada = widget.tarjeta.copyWith(
       banco: _bancoCtrl.text.trim(),
-      tipo: _tipo,
+      tipo: widget.tarjeta.tipo,
       redTarjeta: _redTarjeta,
       titular: _titularCtrl.text.trim(),
       ultimos4: ultimos4,
       mesVencimiento: partes[0],
       anioVencimiento: partes.length > 1 ? partes[1] : '',
       numeroEnmascarado: '**** **** **** $ultimos4',
-      cvv: _cvvCtrl.text.trim(),
       colorTarjeta: _colorSeleccionado,
       limiteCredito: _limiteCtrl.text.isNotEmpty
           ? double.tryParse(_limiteCtrl.text.replaceAll(',', ''))
@@ -157,10 +151,24 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
 
             const SeccionFormulario(titulo: 'Tipo de tarjeta'),
             const SizedBox(height: 10),
-            SelectorTipoTarjeta(
-              seleccionado: _tipo,
-              alCambiar: (v) => setState(() => _tipo = v),
-            ),
+             Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.credit_card, color: Colors.white70),
+                    const SizedBox(width: 10),
+                    Text(
+                      _tipo == 'credito' ? 'Tarjeta de crédito' : 'Tarjeta de débito',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+
 
             const SizedBox(height: 20),
 
@@ -207,10 +215,23 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
             ),
             const SizedBox(height: 14),
 
-            CampoNumeroTarjeta(
-              controlador: _numeroCtrl,
-              alCambiar: (_) => setState(() {}),
-            ),
+           Container(
+  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+  decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.05),
+    borderRadius: BorderRadius.circular(10),
+  ),
+  child: Row(
+    children: [
+      const Icon(Icons.credit_card, color: Colors.white70),
+      const SizedBox(width: 10),
+      Text(
+        '**** **** **** ${widget.tarjeta.ultimos4}',
+        style: const TextStyle(color: Colors.white),
+      ),
+    ],
+  ),
+),
             const SizedBox(height: 14),
 
             Row(
@@ -222,7 +243,7 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: CampoCVVTarjeta(controlador: _cvvCtrl)),
+                
               ],
             ),
 
@@ -246,28 +267,28 @@ class _EditarTarjetaViewState extends State<EditarTarjetaView> {
             ),
             const SizedBox(height: 14),
 
-            Row(
-              children: [
-                Expanded(
-                  child: SelectorDiaTarjeta(
-                    etiqueta: 'Día de corte',
-                    icono: Icons.calendar_today_rounded,
-                    valor: _diaCorte,
-                    alCambiar: (d) => setState(() => _diaCorte = d),
+             if (_tipo == 'credito') 
+              Row(
+                children: [
+                  Expanded(
+                    child: SelectorDiaTarjeta(
+                      etiqueta: 'Día de corte',
+                      icono: Icons.calendar_today_rounded,
+                      valor: _diaCorte,
+                      alCambiar: (d) => setState(() => _diaCorte = d),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SelectorDiaTarjeta(
-                    etiqueta: 'Día de pago',
-                    icono: Icons.payments_rounded,
-                    valor: _diaPago,
-                    alCambiar: (d) => setState(() => _diaPago = d),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SelectorDiaTarjeta(
+                      etiqueta: 'Día de pago',
+                      icono: Icons.payments_rounded,
+                      valor: _diaPago,
+                      alCambiar: (d) => setState(() => _diaPago = d),
+                    ),
                   ),
-                ),
-              ],
-            ),
-
+                ],
+              ),
             const SizedBox(height: 32),
 
             SizedBox(

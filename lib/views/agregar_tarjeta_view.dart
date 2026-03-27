@@ -60,7 +60,6 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
           : numero.length >= 8
           ? '${numero.substring(0, 4)} **** **** $ultimos4'
           : '**** **** **** $ultimos4',
-      cvv: _cvvCtrl.text,
       colorTarjeta: _colorSeleccionado,
       creadaEn: DateTime.now(),
     );
@@ -88,7 +87,6 @@ class _AgregarTarjetaViewState extends State<AgregarTarjetaView> {
       numeroEnmascarado: numero.length >= 8
           ? '${numero.substring(0, 4)} **** **** $ultimos4'
           : '**** **** **** $ultimos4',
-      cvv: _cvvCtrl.text.trim(),
       colorTarjeta: _colorSeleccionado,
       limiteCredito: _limiteCtrl.text.isNotEmpty
           ? double.tryParse(_limiteCtrl.text.replaceAll(',', ''))

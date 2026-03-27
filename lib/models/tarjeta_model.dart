@@ -8,7 +8,6 @@ class TarjetaModel {
   final String mesVencimiento;
   final String anioVencimiento;
   final String numeroEnmascarado;
-  final String cvv;
   final int colorTarjeta; // Color ARGB como int
   final double? limiteCredito;
   final int? diaCorte; 
@@ -25,7 +24,6 @@ class TarjetaModel {
     required this.mesVencimiento,
     required this.anioVencimiento,
     required this.numeroEnmascarado,
-    required this.cvv,
     required this.colorTarjeta,
     required this.creadaEn,
     this.limiteCredito,
@@ -43,7 +41,6 @@ class TarjetaModel {
     String? mesVencimiento,
     String? anioVencimiento,
     String? numeroEnmascarado,
-    String? cvv,
     int? colorTarjeta,
     double? limiteCredito,
     int? diaCorte,
@@ -60,7 +57,6 @@ class TarjetaModel {
       mesVencimiento: mesVencimiento ?? this.mesVencimiento,
       anioVencimiento: anioVencimiento ?? this.anioVencimiento,
       numeroEnmascarado: numeroEnmascarado ?? this.numeroEnmascarado,
-      cvv: cvv ?? this.cvv,
       colorTarjeta: colorTarjeta ?? this.colorTarjeta,
       limiteCredito: limiteCredito ?? this.limiteCredito,
       diaCorte: diaCorte ?? this.diaCorte,
