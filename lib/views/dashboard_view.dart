@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/dashboard_controller.dart';
+import '../services/transaction_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_snackbar.dart';
 import '../views/cards_view.dart';
@@ -21,6 +22,7 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   final dashboardController = DashboardController();
+  final transactionService = TransactionService();
 
   static const double smallCardHeight = 210;
   static const double quickActionsReservedSpace = 120;
@@ -39,6 +41,509 @@ class _DashboardViewState extends State<DashboardView> {
   void dispose() {
     dashboardController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showTransactionBottomSheet({
+    required String type,
+  }) async {
+    final titleController = TextEditingController();
+    final amountController = TextEditingController();
+    final notesController = TextEditingController();
+
+    DateTime selectedDate = DateTime.now();
+    bool isRecurring = false;
+
+    String selectedCategory =
+        type == 'income' ? 'Salario' : 'Comida';
+    String selectedClassification =
+        type == 'income' ? 'recurrent' : 'variable';
+    String selectedRecurrence = 'monthly';
+
+    final incomeCategories = <String>[
+      'Salario',
+      'Freelance',
+      'Bono',
+      'Venta',
+      'Otro ingreso',
+    ];
+
+    final expenseCategories = <String>[
+      'Comida',
+      'Transporte',
+      'Servicios básicos',
+      'Salud',
+      'Entretenimiento',
+      'Educación',
+      'Compras',
+      'Otros',
+    ];
+
+    final categories =
+        type == 'income' ? incomeCategories : expenseCategories;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.backgroundSecondary,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      type == 'income' ? 'Registrar ingreso' : 'Registrar gasto',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _DashboardField(
+                      controller: titleController,
+                      label: 'Concepto',
+                      hintText: type == 'income'
+                          ? 'Salario, freelance, bono...'
+                          : 'Supermercado, transporte, luz...',
+                    ),
+                    const SizedBox(height: 14),
+                    _DashboardField(
+                      controller: amountController,
+                      label: 'Monto',
+                      hintText: '1500',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedCategory,
+                      dropdownColor: AppColors.card,
+                      decoration: _dashboardInputDecoration(
+                        label: 'Categoría',
+                        hintText: 'Selecciona una categoría',
+                      ),
+                      items: categories.map((item) {
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(item),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedCategory = value ?? categories.first;
+                        });
+                      },
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedClassification,
+                      dropdownColor: AppColors.card,
+                      decoration: _dashboardInputDecoration(
+                        label: 'Clasificación',
+                        hintText: 'Selecciona un tipo',
+                      ),
+                      items: (type == 'income'
+                              ? const ['recurrent', 'variable']
+                              : const ['fixed', 'variable'])
+                          .map((item) {
+                        final label = switch (item) {
+                          'recurrent' => 'Recurrente',
+                          'fixed' => 'Fijo',
+                          _ => 'Variable',
+                        };
+
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(label),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedClassification =
+                              value ?? selectedClassification;
+                        });
+                      },
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    SwitchListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      value: isRecurring,
+                      activeColor: AppColors.primary,
+                      title: const Text(
+                        '¿Es recurrente?',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Actívalo si este movimiento se repite periódicamente.',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.58),
+                          fontSize: 12,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setModalState(() {
+                          isRecurring = value;
+                          if (!isRecurring) {
+                            selectedRecurrence = 'monthly';
+                          }
+                        });
+                      },
+                    ),
+                    if (isRecurring) ...[
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedRecurrence,
+                        dropdownColor: AppColors.card,
+                        decoration: _dashboardInputDecoration(
+                          label: 'Frecuencia',
+                          hintText: 'Selecciona una frecuencia',
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'weekly',
+                            child: Text('Semanal'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'biweekly',
+                            child: Text('Quincenal'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'monthly',
+                            child: Text('Mensual'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setModalState(() {
+                            selectedRecurrence = value ?? 'monthly';
+                          });
+                        },
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2023),
+                          lastDate: DateTime(2100),
+                        );
+
+                        if (pickedDate != null) {
+                          setModalState(() {
+                            selectedDate = pickedDate;
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 18,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardSoft,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.06),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Fecha',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _formatDate(selectedDate),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _DashboardField(
+                      controller: notesController,
+                      label: 'Notas',
+                      hintText: 'Opcional',
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final title = titleController.text.trim();
+                          final amount = double.tryParse(
+                            amountController.text.trim(),
+                          );
+                          final notes = notesController.text.trim();
+
+                          if (title.isEmpty || amount == null || amount <= 0) {
+                            AppSnackbar.error(
+                              context,
+                              'Completa correctamente los datos.',
+                            );
+                            return;
+                          }
+
+                          try {
+                            await transactionService.createTransaction(
+                              type: type,
+                              title: title,
+                              category: selectedCategory,
+                              classification: selectedClassification,
+                              amount: amount,
+                              date: selectedDate,
+                              notes: notes,
+                              isRecurring: isRecurring,
+                              recurrence:
+                                  isRecurring ? selectedRecurrence : 'none',
+                            );
+
+                            if (!mounted) {
+                              return;
+                            }
+
+                            Navigator.pop(context);
+                            AppSnackbar.success(
+                              context,
+                              type == 'income'
+                                  ? 'Ingreso registrado correctamente.'
+                                  : 'Gasto registrado correctamente.',
+                            );
+                          } catch (_) {
+                            AppSnackbar.error(
+                              context,
+                              'No se pudo guardar el movimiento.',
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: const Color(0xFF0B1418),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: Text(
+                          type == 'income'
+                              ? 'Guardar ingreso'
+                              : 'Guardar gasto',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showBudgetBottomSheet() async {
+    final amountController = TextEditingController();
+    String selectedPeriod = 'monthly';
+
+    final currentBudget = dashboardController.summary?.budgetSummary;
+    if (currentBudget != null && currentBudget.totalBudget > 0) {
+      amountController.text = currentBudget.totalBudget.toStringAsFixed(0);
+      selectedPeriod = currentBudget.period;
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.backgroundSecondary,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Configurar presupuesto',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _DashboardField(
+                      controller: amountController,
+                      label: 'Monto del presupuesto',
+                      hintText: '10000',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedPeriod,
+                      dropdownColor: AppColors.card,
+                      decoration: _dashboardInputDecoration(
+                        label: 'Periodo',
+                        hintText: 'Selecciona un periodo',
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'weekly',
+                          child: Text('Semanal'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'monthly',
+                          child: Text('Mensual'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedPeriod = value ?? 'monthly';
+                        });
+                      },
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final totalBudget =
+                              double.tryParse(amountController.text.trim());
+
+                          if (totalBudget == null || totalBudget < 0) {
+                            AppSnackbar.error(
+                              context,
+                              'Ingresa un monto válido.',
+                            );
+                            return;
+                          }
+
+                          try {
+                            await transactionService.setBudget(
+                              totalBudget: totalBudget,
+                              period: selectedPeriod,
+                            );
+
+                            if (!mounted) {
+                              return;
+                            }
+
+                            Navigator.pop(context);
+                            AppSnackbar.success(
+                              context,
+                              'Presupuesto actualizado correctamente.',
+                            );
+                          } catch (_) {
+                            AppSnackbar.error(
+                              context,
+                              'No se pudo guardar el presupuesto.',
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: const Color(0xFF0B1418),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: const Text(
+                          'Guardar presupuesto',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day/$month/$year';
   }
 
   @override
@@ -123,12 +628,7 @@ class _DashboardViewState extends State<DashboardView> {
                                       height: smallCardHeight,
                                       child: BudgetCard(
                                         budgetSummary: summary.budgetSummary,
-                                        onTap: () {
-                                          AppSnackbar.info(
-                                            context,
-                                            'Pronto verás el detalle del presupuesto.',
-                                          );
-                                        },
+                                        onTap: _showBudgetBottomSheet,
                                       ),
                                     ),
                                   ),
@@ -209,10 +709,22 @@ class _DashboardViewState extends State<DashboardView> {
             child: QuickActionsBar(
               actions: dashboardController.quickActions,
               onActionTap: (action) {
-                AppSnackbar.info(
-                  context,
-                  'La acción ${action.title} se conectará después.',
-                );
+                switch (action.id) {
+                  case 'expense':
+                    _showTransactionBottomSheet(type: 'expense');
+                    break;
+                  case 'income':
+                    _showTransactionBottomSheet(type: 'income');
+                    break;
+                  case 'budget':
+                    _showBudgetBottomSheet();
+                    break;
+                  default:
+                    AppSnackbar.info(
+                      context,
+                      'Acción no disponible.',
+                    );
+                }
               },
             ),
           ),
@@ -220,4 +732,78 @@ class _DashboardViewState extends State<DashboardView> {
       ),
     );
   }
+}
+
+class _DashboardField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final String hintText;
+  final TextInputType keyboardType;
+  final int maxLines;
+
+  const _DashboardField({
+    required this.controller,
+    required this.label,
+    required this.hintText,
+    this.keyboardType = TextInputType.text,
+    this.maxLines = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      style: const TextStyle(
+        color: AppColors.textPrimary,
+        fontSize: 14,
+      ),
+      cursorColor: AppColors.primary,
+      decoration: _dashboardInputDecoration(
+        label: label,
+        hintText: hintText,
+      ),
+    );
+  }
+}
+
+InputDecoration _dashboardInputDecoration({
+  required String label,
+  required String hintText,
+}) {
+  return InputDecoration(
+    labelText: label,
+    hintText: hintText,
+    labelStyle: const TextStyle(
+      color: AppColors.textSecondary,
+      fontSize: 13,
+    ),
+    hintStyle: TextStyle(
+      color: Colors.white.withOpacity(0.36),
+    ),
+    filled: true,
+    fillColor: AppColors.cardSoft,
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 18,
+    ),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+      borderSide: BorderSide(
+        color: Colors.white.withOpacity(0.06),
+      ),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+      borderSide: const BorderSide(
+        color: AppColors.primary,
+        width: 1.3,
+      ),
+    ),
+  );
 }

@@ -47,6 +47,15 @@ class BudgetCard extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Periodo: ${budgetSummary.periodLabel}',
+              style: const TextStyle(
+                color: AppColors.primarySoft,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               'Total: ${_formatCurrency(budgetSummary.totalBudget)}',

@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../models/auth_user_model.dart';
+import 'dashboard_service.dart';
 
 class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final DashboardService dashboardService = DashboardService();
 
   User? get currentUser => auth.currentUser;
 
@@ -15,10 +18,15 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await auth.signInWithEmailAndPassword(
+    final credential = await auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    await _ensureUserDocument(credential.user);
+    await dashboardService.syncDashboardSummary();
+
+    return credential;
   }
 
   Future<UserCredential> registerWithEmail({
@@ -31,6 +39,7 @@ class AuthService {
     );
 
     await _ensureUserDocument(credential.user);
+    await dashboardService.syncDashboardSummary();
 
     return credential;
   }
@@ -50,6 +59,7 @@ class AuthService {
     final userCredential = await auth.signInWithCredential(credential);
 
     await _ensureUserDocument(userCredential.user);
+    await dashboardService.syncDashboardSummary();
 
     return userCredential;
   }
@@ -113,64 +123,21 @@ class AuthService {
     await dashboardDoc.set({
       'userName': displayName,
       'photoUrl': photoUrl,
-      'currentBalance': 1250.0,
-      'totalIncome': 2000.0,
-      'totalExpenses': 750.0,
-      'cardsCount': 2,
-      'chartBars': [0.42, 0.64, 0.72, 0.76, 0.86],
+      'currentBalance': 0.0,
+      'totalIncome': 0.0,
+      'totalExpenses': 0.0,
+      'cardsCount': 0,
+      'chartBars': [0.18, 0.18, 0.18, 0.18, 0.18],
       'budgetSummary': {
-        'totalBudget': 800.0,
-        'spentAmount': 520.0,
-        'availableAmount': 280.0,
+        'totalBudget': 0.0,
+        'spentAmount': 0.0,
+        'availableAmount': 0.0,
+        'period': 'monthly',
       },
-      'categoryExpenses': [
-        {
-          'id': 'food',
-          'name': 'Comida',
-          'amount': 220.0,
-          'colorValue': 0xFFF2C94C,
-        },
-        {
-          'id': 'transport',
-          'name': 'Transporte',
-          'amount': 180.0,
-          'colorValue': 0xFFF261B4,
-        },
-        {
-          'id': 'shopping',
-          'name': 'Compras',
-          'amount': 140.0,
-          'colorValue': 0xFF35D6C8,
-        },
-        {
-          'id': 'services',
-          'name': 'Servicios',
-          'amount': 210.0,
-          'colorValue': 0xFF4D8DFF,
-        },
-      ],
-      'alerts': [
-        {
-          'id': 'a1',
-          'title': 'Pago de tarjeta',
-          'message': 'Tu pago vence en 2 días.',
-          'level': 'warning',
-        },
-        {
-          'id': 'a2',
-          'title': 'Gastos altos',
-          'message': 'Tus gastos ya superan el 35% del ingreso.',
-          'level': 'warning',
-        },
-        {
-          'id': 'a3',
-          'title': 'Presupuesto activo',
-          'message': 'Llevas el 65% de tu presupuesto mensual.',
-          'level': 'info',
-        },
-      ],
+      'categoryExpenses': [],
+      'alerts': [],
       'createdAt': Timestamp.fromDate(DateTime.now()),
       'updatedAt': Timestamp.fromDate(DateTime.now()),
-    });
+    }, SetOptions(merge: true));
   }
 }

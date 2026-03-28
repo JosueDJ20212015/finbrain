@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../models/dashboard_summary_model.dart';
 import '../models/quick_action_model.dart';
 import '../services/auth_service.dart';
@@ -15,22 +17,21 @@ class DashboardController {
 
   StreamSubscription<DashboardSummaryModel>? _subscription;
 
-   final List<QuickActionModel> quickActions = const [
+  final List<QuickActionModel> quickActions = const [
     QuickActionModel(
       id: 'expense',
       title: '+ Gasto',
       icon: Icons.remove_circle_outline_rounded,
     ),
     QuickActionModel(
-      id: 'home',
-      title: '+ Inicio',
-      icon: Icons.home_rounded,
-    ),
-
-    QuickActionModel(
       id: 'income',
       title: '+ Ingreso',
       icon: Icons.add_circle_outline_rounded,
+    ),
+    QuickActionModel(
+      id: 'budget',
+      title: '+ Presupuesto',
+      icon: Icons.account_balance_wallet_outlined,
     ),
   ];
 
@@ -39,7 +40,9 @@ class DashboardController {
     errorMessage = null;
     refreshUi();
 
-      _subscription?.cancel();
+    dashboardService.syncDashboardSummary();
+
+    _subscription?.cancel();
     _subscription = dashboardService.watchDashboard().listen(
       (dashboard) {
         summary = dashboard;
@@ -47,7 +50,7 @@ class DashboardController {
         errorMessage = null;
         refreshUi();
       },
-        onError: (_) {
+      onError: (_) {
         isLoading = false;
         errorMessage = 'No se pudo cargar el dashboard.';
         refreshUi();
@@ -55,25 +58,26 @@ class DashboardController {
     );
   }
 
-    String get displayName {
+  String get displayName {
     final dashboardName = summary?.userName.trim();
     if (dashboardName != null && dashboardName.isNotEmpty) {
       return dashboardName.split(' ').first;
     }
 
-     final authName = authService.currentUser?.displayName?.trim();
+    final authName = authService.currentUser?.displayName?.trim();
     if (authName != null && authName.isNotEmpty) {
       return authName.split(' ').first;
     }
 
-     final email = authService.currentUser?.email?.trim();
+    final email = authService.currentUser?.email?.trim();
     if (email != null && email.isNotEmpty) {
       return email.split('@').first;
     }
-  return 'Usuario';
+
+    return 'Usuario';
   }
 
-   Future<void> signOut() async {
+  Future<void> signOut() async {
     await authService.signOut();
   }
 

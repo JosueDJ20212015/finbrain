@@ -3,10 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/card_purchase_model.dart';
 import '../models/credit_card_model.dart';
+import 'dashboard_service.dart';
 
 class CreditCardService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final DashboardService dashboardService = DashboardService();
 
   String? get currentUid => auth.currentUser?.uid;
 
@@ -85,6 +87,7 @@ class CreditCardService {
     });
 
     await _syncDashboardCardsCount(uid);
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> updateCard({
@@ -118,6 +121,7 @@ class CreditCardService {
     });
 
     await _syncDashboardCardsCount(uid);
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> deleteCard(String cardId) async {
@@ -134,6 +138,7 @@ class CreditCardService {
 
     await _cardsRef(uid).doc(cardId).delete();
     await _syncDashboardCardsCount(uid);
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> createPurchase({
@@ -160,6 +165,8 @@ class CreditCardService {
       'createdAt': Timestamp.fromDate(now),
       'updatedAt': Timestamp.fromDate(now),
     });
+
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> updatePurchase({
@@ -184,6 +191,8 @@ class CreditCardService {
       'notes': notes,
       'updatedAt': Timestamp.fromDate(DateTime.now()),
     });
+
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> deletePurchase({
@@ -196,6 +205,7 @@ class CreditCardService {
     }
 
     await _purchasesRef(uid, cardId).doc(purchaseId).delete();
+    await dashboardService.syncDashboardSummary();
   }
 
   Future<void> _syncDashboardCardsCount(String uid) async {
