@@ -260,7 +260,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       ),
                                     )
                                   : const Text(
-                                      'Iniciar sesión',
+                                      'Iniciar sesion',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w800,

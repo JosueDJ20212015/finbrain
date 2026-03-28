@@ -94,19 +94,19 @@ class _CardsViewState extends State<CardsView> {
                     _AppField(
                       controller: bankNameController,
                       label: 'Banco',
-                      hintText: 'BAC, Ficohsa, Atlántida...',
+                      hintText: 'BAC, Ficohsa, Atlantida...',
                     ),
                     const SizedBox(height: 14),
                     _AppField(
                       controller: cardNameController,
                       label: 'Nombre de la tarjeta',
-                      hintText: 'Rewards Platinum',
+                      hintText: 'Platinum',
                     ),
                     const SizedBox(height: 14),
                     _AppField(
                       controller: holderNameController,
                       label: 'Titular',
-                      hintText: 'Elmer Romero',
+                      hintText: 'Elmer R',
                     ),
                     const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
@@ -141,7 +141,7 @@ class _CardsViewState extends State<CardsView> {
                         Expanded(
                           child: _AppField(
                             controller: lastFourDigitsController,
-                            label: 'Últimos 4 dígitos',
+                            label: 'Ultimos 4 digitos',
                             hintText: '1234',
                             keyboardType: TextInputType.number,
                           ),
@@ -150,7 +150,7 @@ class _CardsViewState extends State<CardsView> {
                         Expanded(
                           child: _AppField(
                             controller: creditLimitController,
-                            label: 'Límite',
+                            label: 'Limite',
                             hintText: '50000',
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -165,7 +165,7 @@ class _CardsViewState extends State<CardsView> {
                         Expanded(
                           child: _AppField(
                             controller: statementDayController,
-                            label: 'Día de corte',
+                            label: 'Dia de corte',
                             hintText: '15',
                             keyboardType: TextInputType.number,
                           ),
@@ -174,7 +174,7 @@ class _CardsViewState extends State<CardsView> {
                         Expanded(
                           child: _AppField(
                             controller: dueDayController,
-                            label: 'Día de pago',
+                            label: 'Dia de pago',
                             hintText: '28',
                             keyboardType: TextInputType.number,
                           ),
@@ -215,7 +215,7 @@ class _CardsViewState extends State<CardsView> {
                               dueDay > 31) {
                             AppSnackbar.error(
                               context,
-                              'Completa correctamente todos los campos.',
+                              'Completa todos los campos.',
                             );
                             return;
                           }
@@ -239,7 +239,7 @@ class _CardsViewState extends State<CardsView> {
                             Navigator.pop(context);
                             AppSnackbar.success(
                               context,
-                              'Tarjeta registrada correctamente.',
+                              'Tarjeta registrada',
                             );
                           } catch (_) {
                             AppSnackbar.error(
@@ -278,7 +278,7 @@ class _CardsViewState extends State<CardsView> {
     if (cardsController.selectedCard == null) {
       AppSnackbar.info(
         context,
-        'Primero debes registrar una tarjeta.',
+        'Primero debes registrar una tarjeta',
       );
       return;
     }
@@ -325,7 +325,7 @@ class _CardsViewState extends State<CardsView> {
                     const SizedBox(height: 18),
                     _AppField(
                       controller: titleController,
-                      label: 'Descripción',
+                      label: 'Descripcion',
                       hintText: 'Supermercado, gasolina, Amazon...',
                     ),
                     const SizedBox(height: 14),
@@ -434,7 +434,7 @@ class _CardsViewState extends State<CardsView> {
                               installments <= 0) {
                             AppSnackbar.error(
                               context,
-                              'Completa correctamente los datos de la compra.',
+                              'Completa los datos de la compra',
                             );
                             return;
                           }
@@ -455,7 +455,7 @@ class _CardsViewState extends State<CardsView> {
                             Navigator.pop(context);
                             AppSnackbar.success(
                               context,
-                              'Compra registrada correctamente.',
+                              'Compra registrada',
                             );
                           } catch (_) {
                             AppSnackbar.error(
@@ -529,9 +529,9 @@ class _CardsViewState extends State<CardsView> {
         return;
       }
 
-      AppSnackbar.success(context, 'Compra eliminada.');
+      AppSnackbar.success(context, 'Compra eliminada');
     } catch (_) {
-      AppSnackbar.error(context, 'No se pudo eliminar la compra.');
+      AppSnackbar.error(context, 'No se pudo eliminar');
     }
   }
 
@@ -556,9 +556,9 @@ class _CardsViewState extends State<CardsView> {
               Expanded(
                 child: _InfoPill(
                   icon: Icons.calendar_month_rounded,
-                  title: 'Próximo corte',
+                  title: 'Proximo corte',
                   value:
-                      '${_formatDate(nextCutDate)} · faltan ${card.daysUntilStatement()} días',
+                      '${_formatDate(nextCutDate)} · faltan ${card.daysUntilStatement()} dias',
                   highlight: card.shouldWarnStatementSoon,
                 ),
               ),
@@ -566,7 +566,7 @@ class _CardsViewState extends State<CardsView> {
               Expanded(
                 child: _InfoPill(
                   icon: Icons.notifications_active_outlined,
-                  title: 'Próximo pago',
+                  title: 'Proximo pago',
                   value:
                       '${_formatDate(nextDueDate)} · faltan ${card.daysUntilDue()} días',
                   highlight: card.shouldWarnDueSoon,
@@ -578,7 +578,7 @@ class _CardsViewState extends State<CardsView> {
           /*Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Base lista para alertar 5 días antes del corte y 7 días antes del pago.',
+              'Base lista para alertar',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.66),
                 fontSize: 12,
@@ -621,7 +621,7 @@ class _CardsViewState extends State<CardsView> {
               ),
               const SizedBox(height: 22),
               const Text(
-                'No tienes tarjetas aún',
+                'No hay tarjetas',
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 26,
@@ -630,7 +630,7 @@ class _CardsViewState extends State<CardsView> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Agrega tu primera tarjeta de crédito o débito para comenzar.',
+                'Agrega tu primera tarjeta de credito',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.68),
@@ -729,7 +729,7 @@ class _CardsViewState extends State<CardsView> {
               Expanded(
                 child: Center(
                   child: Text(
-                    'Aún no has registrado compras para esta tarjeta.',
+                    'No hay compras registradas en esta tarjeta',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.66),
@@ -918,12 +918,12 @@ class _CardsViewState extends State<CardsView> {
 
                                   AppSnackbar.success(
                                     context,
-                                    'Tarjeta eliminada correctamente.',
+                                    'Tarjeta eliminada',
                                   );
                                 } catch (_) {
                                   AppSnackbar.error(
                                     context,
-                                    'No se pudo eliminar la tarjeta.',
+                                    'No se pudo eliminar',
                                   );
                                 }
                               },

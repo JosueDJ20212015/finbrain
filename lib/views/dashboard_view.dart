@@ -70,10 +70,10 @@ class _DashboardViewState extends State<DashboardView> {
     final expenseCategories = <String>[
       'Comida',
       'Transporte',
-      'Servicios básicos',
+      'Servicios basicos',
       'Salud',
       'Entretenimiento',
-      'Educación',
+      'Educacion',
       'Compras',
       'Otros',
     ];
@@ -135,8 +135,8 @@ class _DashboardViewState extends State<DashboardView> {
                       initialValue: selectedCategory,
                       dropdownColor: AppColors.card,
                       decoration: _dashboardInputDecoration(
-                        label: 'Categoría',
-                        hintText: 'Selecciona una categoría',
+                        label: 'Categoria',
+                        hintText: 'Selecciona una categoria',
                       ),
                       items: categories.map((item) {
                         return DropdownMenuItem(
@@ -160,7 +160,7 @@ class _DashboardViewState extends State<DashboardView> {
                       initialValue: selectedClassification,
                       dropdownColor: AppColors.card,
                       decoration: _dashboardInputDecoration(
-                        label: 'Clasificación',
+                        label: 'Clasificacion',
                         hintText: 'Selecciona un tipo',
                       ),
                       items: (type == 'income'
@@ -196,14 +196,14 @@ class _DashboardViewState extends State<DashboardView> {
                       value: isRecurring,
                       activeColor: AppColors.primary,
                       title: const Text(
-                        '¿Es recurrente?',
+                        'Es recurrente?',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       subtitle: Text(
-                        'Actívalo si este movimiento se repite periódicamente.',
+                        'Actva si este movimiento se repite periodicamente',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.58),
                           fontSize: 12,
@@ -329,7 +329,7 @@ class _DashboardViewState extends State<DashboardView> {
                           if (title.isEmpty || amount == null || amount <= 0) {
                             AppSnackbar.error(
                               context,
-                              'Completa correctamente los datos.',
+                              'Completa los datos',
                             );
                             return;
                           }
@@ -356,13 +356,13 @@ class _DashboardViewState extends State<DashboardView> {
                             AppSnackbar.success(
                               context,
                               type == 'income'
-                                  ? 'Ingreso registrado correctamente.'
-                                  : 'Gasto registrado correctamente.',
+                                  ? 'Ingreso registrado'
+                                  : 'Gasto registrado',
                             );
                           } catch (_) {
                             AppSnackbar.error(
                               context,
-                              'No se pudo guardar el movimiento.',
+                              'No se pudo guardar el movimiento',
                             );
                           }
                         },
@@ -486,7 +486,7 @@ class _DashboardViewState extends State<DashboardView> {
                           if (totalBudget == null || totalBudget < 0) {
                             AppSnackbar.error(
                               context,
-                              'Ingresa un monto válido.',
+                              'Ingresa un monto valido',
                             );
                             return;
                           }
@@ -504,12 +504,12 @@ class _DashboardViewState extends State<DashboardView> {
                             Navigator.pop(context);
                             AppSnackbar.success(
                               context,
-                              'Presupuesto actualizado correctamente.',
+                              'Presupuesto actualizado',
                             );
                           } catch (_) {
                             AppSnackbar.error(
                               context,
-                              'No se pudo guardar el presupuesto.',
+                              'No se pudo guardar',
                             );
                           }
                         },
@@ -580,7 +580,7 @@ class _DashboardViewState extends State<DashboardView> {
                   : summary == null
                       ? const Center(
                           child: Text(
-                            'No hay información para mostrar.',
+                            'No hay informacion',
                             style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 16,
@@ -607,6 +607,8 @@ class _DashboardViewState extends State<DashboardView> {
                                 },
                               ),
                               const SizedBox(height: 22),
+
+                              //balance Card
                               BalanceCard(
                                 currentBalance: summary.currentBalance,
                                 totalIncome: summary.totalIncome,
@@ -615,7 +617,7 @@ class _DashboardViewState extends State<DashboardView> {
                                 onTap: () {
                                   AppSnackbar.info(
                                     context,
-                                    'Pronto verás el detalle del balance.',
+                                    'En desarrollo',
                                   );
                                 },
                               ),
@@ -633,6 +635,7 @@ class _DashboardViewState extends State<DashboardView> {
                                     ),
                                   ),
                                   const SizedBox(width: 14),
+                                  //categoria Card
                                   Expanded(
                                     child: SizedBox(
                                       height: smallCardHeight,
@@ -641,7 +644,7 @@ class _DashboardViewState extends State<DashboardView> {
                                         onTap: () {
                                           AppSnackbar.info(
                                             context,
-                                            'Pronto verás los gastos por categoría.',
+                                            'En desarrollo',
                                           );
                                         },
                                       ),
@@ -670,6 +673,8 @@ class _DashboardViewState extends State<DashboardView> {
                                     ),
                                   ),
                                   const SizedBox(width: 14),
+
+                                  // Alerts card
                                   Expanded(
                                     child: SizedBox(
                                       height: smallCardHeight,
@@ -678,7 +683,7 @@ class _DashboardViewState extends State<DashboardView> {
                                         onTap: () {
                                           AppSnackbar.info(
                                             context,
-                                            'Pronto verás todas tus alertas.',
+                                            'En desarrollo',
                                           );
                                         },
                                       ),
@@ -722,7 +727,7 @@ class _DashboardViewState extends State<DashboardView> {
                   default:
                     AppSnackbar.info(
                       context,
-                      'Acción no disponible.',
+                      'No disponible',
                     );
                 }
               },

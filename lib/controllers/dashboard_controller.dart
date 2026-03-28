@@ -20,17 +20,17 @@ class DashboardController {
   final List<QuickActionModel> quickActions = const [
     QuickActionModel(
       id: 'expense',
-      title: '+ Gasto',
+      title: 'Gasto',
       icon: Icons.remove_circle_outline_rounded,
     ),
     QuickActionModel(
       id: 'income',
-      title: '+ Ingreso',
+      title: 'Ingreso',
       icon: Icons.add_circle_outline_rounded,
     ),
     QuickActionModel(
       id: 'budget',
-      title: '+ Presupuesto',
+      title: 'Presupuesto',
       icon: Icons.account_balance_wallet_outlined,
     ),
   ];
@@ -52,7 +52,7 @@ class DashboardController {
       },
       onError: (_) {
         isLoading = false;
-        errorMessage = 'No se pudo cargar el dashboard.';
+        errorMessage = 'No se pudo cargar';
         refreshUi();
       },
     );
