@@ -20,19 +20,25 @@ class MiniBarChart extends StatelessWidget {
       AppColors.primary,
     ];
 
+    final fixedHeights = <double>[
+      18,
+      24,
+      30,
+      34,
+      38,
+    ];
+
     return SizedBox(
       height: 92,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
-        children: List.generate(values.length, (index) {
-          final value = values[index].clamp(0.08, 1.0);
-
+        children: List.generate(fixedHeights.length, (index) {
           return Padding(
             padding: const EdgeInsets.only(left: 8),
             child: Container(
               width: 16,
-              height: 70 * value,
+              height: fixedHeights[index],
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(

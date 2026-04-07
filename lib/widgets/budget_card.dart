@@ -13,8 +13,54 @@ class BudgetCard extends StatelessWidget {
     required this.onTap,
   });
 
-  String _formatCurrency(double value) {
+  String formatCurrency(double value) {
     return 'Lps ${value.toStringAsFixed(0)}';
+  }
+
+  List<Color> get progressColors {
+    final progress = budgetSummary.progress;
+
+    if (progress >= 0.95) {
+      return const [
+        Color(0xFFFF8A80),
+        Color(0xFFFF5252),
+        Color(0xFFD32F2F),
+      ];
+    }
+
+    if (progress >= 0.85) {
+      return const [
+        Color(0xFFFFB74D),
+        Color(0xFFFF7043),
+        Color(0xFFFF5252),
+      ];
+    }
+
+    if (progress >= 0.70) {
+      return const [
+        AppColors.yellow,
+        AppColors.orange,
+        AppColors.pink,
+      ];
+    }
+
+    return const [
+      AppColors.cyan,
+      AppColors.blue,
+      AppColors.primary,
+    ];
+  }
+
+  Color get availableColor {
+    if (budgetSummary.progress >= 0.90) {
+      return const Color(0xFFFF6B6B);
+    }
+
+    if (budgetSummary.progress >= 0.75) {
+      return AppColors.yellow;
+    }
+
+    return AppColors.primarySoft;
   }
 
   @override
@@ -58,7 +104,7 @@ class BudgetCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Total: ${_formatCurrency(budgetSummary.totalBudget)}',
+              'Total: ${formatCurrency(budgetSummary.totalBudget)}',
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 14,
@@ -67,7 +113,7 @@ class BudgetCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Gastado: ${_formatCurrency(budgetSummary.spentAmount)}',
+              'Gastado: ${formatCurrency(budgetSummary.spentAmount)}',
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
@@ -76,9 +122,9 @@ class BudgetCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Disponible: ${_formatCurrency(budgetSummary.availableAmount)}',
-              style: const TextStyle(
-                color: AppColors.primarySoft,
+              'Disponible: ${formatCurrency(budgetSummary.availableAmount)}',
+              style: TextStyle(
+                color: availableColor,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -94,12 +140,8 @@ class BudgetCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppColors.cyan,
-                          AppColors.blue,
-                          AppColors.primary,
-                        ],
+                      gradient: LinearGradient(
+                        colors: progressColors,
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),

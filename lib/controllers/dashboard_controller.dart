@@ -15,23 +15,23 @@ class DashboardController {
   bool isLoading = true;
   String? errorMessage;
 
-  StreamSubscription<DashboardSummaryModel>? _subscription;
+  StreamSubscription<DashboardSummaryModel>? subscription;
 
   final List<QuickActionModel> quickActions = const [
     QuickActionModel(
       id: 'expense',
-      title: 'Gasto',
+      title: '+ Gasto',
       icon: Icons.remove_circle_outline_rounded,
     ),
     QuickActionModel(
       id: 'income',
-      title: 'Ingreso',
+      title: '+ Ingreso',
       icon: Icons.add_circle_outline_rounded,
     ),
     QuickActionModel(
-      id: 'budget',
-      title: 'Presupuesto',
-      icon: Icons.account_balance_wallet_outlined,
+      id: 'movements',
+      title: 'Movimientos',
+      icon: Icons.receipt_long_rounded,
     ),
   ];
 
@@ -42,8 +42,8 @@ class DashboardController {
 
     dashboardService.syncDashboardSummary();
 
-    _subscription?.cancel();
-    _subscription = dashboardService.watchDashboard().listen(
+    subscription?.cancel();
+    subscription = dashboardService.watchDashboard().listen(
       (dashboard) {
         summary = dashboard;
         isLoading = false;
@@ -52,7 +52,7 @@ class DashboardController {
       },
       onError: (_) {
         isLoading = false;
-        errorMessage = 'No se pudo cargar';
+        errorMessage = 'No se pudo cargar el dashboard.';
         refreshUi();
       },
     );
@@ -82,6 +82,6 @@ class DashboardController {
   }
 
   void dispose() {
-    _subscription?.cancel();
+    subscription?.cancel();
   }
 }
