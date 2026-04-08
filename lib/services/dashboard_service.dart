@@ -78,6 +78,33 @@ class DashboardService {
       return CreditCardModel.fromMap(doc.data(), id: doc.id);
     }).toList();
 
+    // Compute per-card spent amounts (purchases in current billing cycle)
+    final cardsSpent = <String, double>{};
+    for (final card in cards) {
+      final purchasesSnapshot =
+          await _cardsRef(uid).doc(card.id).collection('purchases').get();
+      final now = DateTime.now();
+      final cycleStart = _billingCycleStart(card, now);
+      double total = 0;
+      for (final doc in purchasesSnapshot.docs) {
+        final data = doc.data();
+        final dateRaw = data['purchaseDate'];
+        DateTime purchaseDate;
+        if (dateRaw is Timestamp) {
+          purchaseDate = dateRaw.toDate();
+        } else if (dateRaw is DateTime) {
+          purchaseDate = dateRaw;
+        } else {
+          purchaseDate = now;
+        }
+        final amount = (data['amount'] as num?)?.toDouble() ?? 0;
+        if (!purchaseDate.isBefore(cycleStart)) {
+          total += amount;
+        }
+      }
+      cardsSpent[card.id] = total;
+    }
+
     final totalIncome = transactions
         .where((item) => item.isIncome)
         .fold<double>(0, (sum, item) => sum + item.amount);
@@ -104,8 +131,10 @@ class DashboardService {
     final chartBars = _buildChartBars(transactions);
     final alerts = _buildAlerts(
       cards: cards,
+      cardsSpent: cardsSpent,
       totalIncome: totalIncome,
       totalExpenses: totalExpenses,
+      currentBalance: currentBalance,
       totalBudget: totalBudget,
       spentAmount: spentAmount,
     );
@@ -128,6 +157,28 @@ class DashboardService {
       'alerts': alerts,
       'updatedAt': Timestamp.fromDate(DateTime.now()),
     }, SetOptions(merge: true));
+  }
+
+  /// Returns the start of the current billing cycle for a given card.
+  DateTime _billingCycleStart(CreditCardModel card, DateTime now) {
+    final thisMonthStatement =
+        _safeDate(now.year, now.month, card.statementDay);
+    final nowDate = DateTime(now.year, now.month, now.day);
+
+    if (!thisMonthStatement.isBefore(nowDate)) {
+      // Statement hasn't happened yet this month → cycle started last month
+      final prevMonth = now.month == 1 ? 12 : now.month - 1;
+      final prevYear = now.month == 1 ? now.year - 1 : now.year;
+      return _safeDate(prevYear, prevMonth, card.statementDay);
+    }
+    // Statement already passed → cycle started this month on statementDay
+    return thisMonthStatement;
+  }
+
+  static DateTime _safeDate(int year, int month, int day) {
+    final maxDay = DateTime(year, month + 1, 0).day;
+    final safeDay = day > maxDay ? maxDay : day;
+    return DateTime(year, month, safeDay);
   }
 
   double _calculateBudgetSpent({
@@ -228,57 +279,165 @@ class DashboardService {
 
   List<Map<String, dynamic>> _buildAlerts({
     required List<CreditCardModel> cards,
+    required Map<String, double> cardsSpent,
     required double totalIncome,
     required double totalExpenses,
+    required double currentBalance,
     required double totalBudget,
     required double spentAmount,
   }) {
     final alerts = <Map<String, dynamic>>[];
+    final now = DateTime.now();
 
-    for (final card in cards) {
-      if (card.shouldWarnStatementSoon) {
+    String currency(double v) => 'L. ${v.toStringAsFixed(2)}';
+
+    // ── Budget alerts ──────────────────────────────────────────────────
+    if (totalBudget > 0) {
+      final ratio = spentAmount / totalBudget;
+
+      if (spentAmount > totalBudget) {
+        final excess = spentAmount - totalBudget;
         alerts.add({
-          'id': 'statement_${card.id}',
-          'title': 'Corte de tarjeta',
+          'id': 'budget_exceeded',
+          'title': 'Presupuesto superado',
           'message':
-              'La tarjeta ${card.bankName} cierra en ${card.daysUntilStatement()} día(s).',
-          'level': 'warning',
+              'Has excedido tu presupuesto en ${currency(excess)}. '
+              'Gasto: ${currency(spentAmount)} / Límite: ${currency(totalBudget)}.',
+          'level': 'danger',
+          'type': 'budget',
+          'cardId': null,
+          'date': Timestamp.fromDate(now),
         });
-      }
-
-      if (card.shouldWarnDueSoon) {
+      } else if (ratio >= 1.0) {
         alerts.add({
-          'id': 'due_${card.id}',
-          'title': 'Pago de tarjeta',
+          'id': 'budget_100',
+          'title': 'Presupuesto agotado',
           'message':
-              'La tarjeta ${card.bankName} vence en ${card.daysUntilDue()} día(s).',
+              'Has alcanzado el 100% de tu presupuesto (${currency(spentAmount)}).',
+          'level': 'danger',
+          'type': 'budget',
+          'cardId': null,
+          'date': Timestamp.fromDate(now),
+        });
+      } else if (ratio >= 0.90) {
+        final remaining = totalBudget - spentAmount;
+        alerts.add({
+          'id': 'budget_90',
+          'title': 'Presupuesto al 90%',
+          'message':
+              'Has consumido el 90% de tu presupuesto. '
+              'Solo te quedan ${currency(remaining)}.',
           'level': 'warning',
+          'type': 'budget',
+          'cardId': null,
+          'date': Timestamp.fromDate(now),
+        });
+      } else if (ratio >= 0.80) {
+        final remaining = totalBudget - spentAmount;
+        alerts.add({
+          'id': 'budget_80',
+          'title': 'Presupuesto al 80%',
+          'message':
+              'Has consumido el 80% de tu presupuesto. '
+              'Disponible: ${currency(remaining)}.',
+          'level': 'info',
+          'type': 'budget',
+          'cardId': null,
+          'date': Timestamp.fromDate(now),
         });
       }
     }
 
+    // ── Credit card alerts ─────────────────────────────────────────────
+    for (final card in cards) {
+      final daysStatement = card.daysUntilStatement();
+      final daysDue = card.daysUntilDue();
+      final spent = cardsSpent[card.id] ?? 0;
+      final name = '${card.bankName} ••${card.lastFourDigits}';
+
+      // Statement / Corte
+      if (daysStatement == 0) {
+        alerts.add({
+          'id': 'statement_today_${card.id}',
+          'title': 'Corte hoy — $name',
+          'message':
+              'Hoy es la fecha de corte de $name. '
+              'Monto acumulado en este ciclo: ${currency(spent)}.',
+          'level': 'danger',
+          'type': 'card_statement',
+          'cardId': card.id,
+          'date': Timestamp.fromDate(now),
+        });
+      } else if (daysStatement <= 3) {
+        final dayLabel = daysStatement == 1 ? '1 día' : '$daysStatement días';
+        alerts.add({
+          'id': 'statement_${daysStatement}d_${card.id}',
+          'title': 'Corte en $dayLabel — $name',
+          'message':
+              'Faltan $dayLabel para el corte de $name. '
+              'Monto gastado en este ciclo: ${currency(spent)}.',
+          'level': daysStatement == 1 ? 'warning' : 'info',
+          'type': 'card_statement',
+          'cardId': card.id,
+          'date': Timestamp.fromDate(now),
+        });
+      }
+
+      // Due date / Pago
+      if (daysDue == 0) {
+        alerts.add({
+          'id': 'due_today_${card.id}',
+          'title': 'Pago vence hoy — $name',
+          'message':
+              'Hoy vence el pago de $name. '
+              'No olvides realizar tu pago para evitar cargos.',
+          'level': 'danger',
+          'type': 'card_due',
+          'cardId': card.id,
+          'date': Timestamp.fromDate(now),
+        });
+      } else if (daysDue <= 3) {
+        final dayLabel = daysDue == 1 ? '1 día' : '$daysDue días';
+        alerts.add({
+          'id': 'due_${daysDue}d_${card.id}',
+          'title': 'Pago en $dayLabel — $name',
+          'message':
+              'Faltan $dayLabel para el vencimiento de $name. '
+              'Recuerda realizar tu pago a tiempo.',
+          'level': daysDue == 1 ? 'warning' : 'info',
+          'type': 'card_due',
+          'cardId': card.id,
+          'date': Timestamp.fromDate(now),
+        });
+      }
+    }
+
+    // ── General alerts ─────────────────────────────────────────────────
     if (totalExpenses > totalIncome && totalIncome > 0) {
       alerts.add({
         'id': 'expenses_over_income',
         'title': 'Egresos mayores que ingresos',
-        'message': 'Tus egresos actuales están superando tus ingresos.',
+        'message':
+            'Tus egresos (${currency(totalExpenses)}) superan tus ingresos '
+            '(${currency(totalIncome)}) este período.',
         'level': 'warning',
+        'type': 'general',
+        'cardId': null,
+        'date': Timestamp.fromDate(now),
       });
     }
 
-    if (totalBudget > 0 && spentAmount >= totalBudget) {
+    if (currentBalance < 0) {
       alerts.add({
-        'id': 'budget_exceeded',
-        'title': 'Presupuesto agotado',
-        'message': 'Ya alcanzaste o superaste tu presupuesto configurado.',
-        'level': 'warning',
-      });
-    } else if (totalBudget > 0 && spentAmount >= (totalBudget * 0.8)) {
-      alerts.add({
-        'id': 'budget_80',
-        'title': 'Presupuesto en 80%',
-        'message': 'Ya consumiste más del 80% de tu presupuesto.',
-        'level': 'info',
+        'id': 'negative_balance',
+        'title': 'Saldo negativo',
+        'message':
+            'Tu saldo actual es negativo: ${currency(currentBalance)}. '
+            'Revisa tus egresos.',
+        'level': 'danger',
+        'type': 'general',
+        'cardId': null,
+        'date': Timestamp.fromDate(now),
       });
     }
 
