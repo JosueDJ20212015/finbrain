@@ -20,18 +20,23 @@ class DashboardController {
   final List<QuickActionModel> quickActions = const [
     QuickActionModel(
       id: 'expense',
-      title: '+ Gasto',
+      title: 'Gasto',
       icon: Icons.remove_circle_outline_rounded,
     ),
     QuickActionModel(
       id: 'income',
-      title: '+ Ingreso',
+      title: 'Ingreso',
       icon: Icons.add_circle_outline_rounded,
     ),
     QuickActionModel(
       id: 'movements',
       title: 'Movimientos',
       icon: Icons.receipt_long_rounded,
+    ),
+    QuickActionModel(
+      id: 'generalBalance',
+      title: 'Balance',
+      icon: Icons.account_balance_wallet_outlined,
     ),
   ];
 

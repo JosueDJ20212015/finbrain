@@ -4,8 +4,10 @@ import '../controllers/dashboard_controller.dart';
 import '../services/transaction_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_snackbar.dart';
+import '../views/analytics_view.dart';
+import '../views/balance_general_sheet_view.dart';
 import '../views/cards_view.dart';
-import '../views/movements_view.dart';
+import '../views/movements_sheet_view.dart';
 import '../widgets/alerts_card.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/budget_card.dart';
@@ -13,7 +15,6 @@ import '../widgets/cards_summary_card.dart';
 import '../widgets/category_chart_card.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/quick_actions_bar.dart';
-import '../views/analytics_view.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -26,8 +27,10 @@ class _DashboardViewState extends State<DashboardView> {
   final dashboardController = DashboardController();
   final transactionService = TransactionService();
 
-  static const double smallCardHeight = 210;
+  static const double smallCardHeight = 200;
   static const double quickActionsReservedSpace = 120;
+
+  String selectedActionId = '';
 
   @override
   void initState() {
@@ -45,7 +48,9 @@ class _DashboardViewState extends State<DashboardView> {
     super.dispose();
   }
 
-  Future<void> showTransactionBottomSheet({required String type}) async {
+  Future<void> showTransactionBottomSheet({
+    required String type,
+  }) async {
     final titleController = TextEditingController();
     final amountController = TextEditingController();
     final notesController = TextEditingController();
@@ -54,7 +59,8 @@ class _DashboardViewState extends State<DashboardView> {
     bool isRecurring = false;
 
     String selectedCategory = type == 'income' ? 'Salario' : 'Comida';
-    String selectedClassification = type == 'income' ? 'recurrent' : 'variable';
+    String selectedClassification =
+        type == 'income' ? 'recurrent' : 'variable';
     String selectedRecurrence = 'monthly';
 
     final incomeCategories = <String>[
@@ -94,16 +100,16 @@ class _DashboardViewState extends State<DashboardView> {
               ),
               decoration: const BoxDecoration(
                 color: AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      type == 'income'
-                          ? 'Registrar ingreso'
-                          : 'Registrar gasto',
+                      type == 'income' ? 'Registrar ingreso' : 'Registrar gasto',
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 24,
@@ -136,7 +142,10 @@ class _DashboardViewState extends State<DashboardView> {
                         hintText: 'Selecciona una categoría',
                       ),
                       items: categories.map((item) {
-                        return DropdownMenuItem(value: item, child: Text(item));
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(item),
+                        );
                       }).toList(),
                       onChanged: (value) {
                         setModalState(() {
@@ -157,23 +166,21 @@ class _DashboardViewState extends State<DashboardView> {
                         label: 'Clasificación',
                         hintText: 'Selecciona un tipo',
                       ),
-                      items:
-                          (type == 'income'
-                                  ? const ['recurrent', 'variable']
-                                  : const ['fixed', 'variable'])
-                              .map((item) {
-                                final label = switch (item) {
-                                  'recurrent' => 'Recurrente',
-                                  'fixed' => 'Fijo',
-                                  _ => 'Variable',
-                                };
+                      items: (type == 'income'
+                              ? const ['recurrent', 'variable']
+                              : const ['fixed', 'variable'])
+                          .map((item) {
+                        final label = switch (item) {
+                          'recurrent' => 'Recurrente',
+                          'fixed' => 'Fijo',
+                          _ => 'Variable',
+                        };
 
-                                return DropdownMenuItem(
-                                  value: item,
-                                  child: Text(label),
-                                );
-                              })
-                              .toList(),
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(label),
+                        );
+                      }).toList(),
                       onChanged: (value) {
                         setModalState(() {
                           selectedClassification =
@@ -340,9 +347,8 @@ class _DashboardViewState extends State<DashboardView> {
                               date: selectedDate,
                               notes: notes,
                               isRecurring: isRecurring,
-                              recurrence: isRecurring
-                                  ? selectedRecurrence
-                                  : 'none',
+                              recurrence:
+                                  isRecurring ? selectedRecurrence : 'none',
                             );
 
                             if (!mounted) {
@@ -417,7 +423,9 @@ class _DashboardViewState extends State<DashboardView> {
               ),
               decoration: const BoxDecoration(
                 color: AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               child: SingleChildScrollView(
                 child: Column(
@@ -475,9 +483,8 @@ class _DashboardViewState extends State<DashboardView> {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: () async {
-                          final totalBudget = double.tryParse(
-                            amountController.text.trim(),
-                          );
+                          final totalBudget =
+                              double.tryParse(amountController.text.trim());
 
                           if (totalBudget == null || totalBudget < 0) {
                             AppSnackbar.error(
@@ -535,6 +542,53 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
+  Future<void> showMovementsBottomSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const MovementsSheetView(),
+    );
+  }
+
+  Future<void> showBalanceGeneralBottomSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const BalanceGeneralSheetView(),
+    );
+  }
+
+  Future<void> handleQuickActionTap(String actionId) async {
+    setState(() {
+      selectedActionId = actionId;
+    });
+
+    switch (actionId) {
+      case 'expense':
+        await showTransactionBottomSheet(type: 'expense');
+        break;
+      case 'income':
+        await showTransactionBottomSheet(type: 'income');
+        break;
+      case 'movements':
+        await showMovementsBottomSheet();
+        break;
+      case 'generalBalance':
+        await showBalanceGeneralBottomSheet();
+        break;
+      default:
+        break;
+    }
+
+    if (mounted) {
+      setState(() {
+        selectedActionId = '';
+      });
+    }
+  }
+
   String formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -548,141 +602,145 @@ class _DashboardViewState extends State<DashboardView> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.pageGradient),
+        decoration: const BoxDecoration(
+          gradient: AppColors.pageGradient,
+        ),
         child: SafeArea(
           child: dashboardController.isLoading
               ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
                 )
               : dashboardController.errorMessage != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      dashboardController.errorMessage!,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          dashboardController.errorMessage!,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-              : summary == null
-              ? const Center(
-                  child: Text(
-                    'No hay información para mostrar.',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(
-                    20,
-                    14,
-                    20,
-                    quickActionsReservedSpace,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DashboardHeader(
-                        appTitle: 'finBrain',
-                        userName: dashboardController.displayName,
-                        photoUrl: summary.photoUrl,
-                        onLogout: () async {
-                          await dashboardController.signOut();
-                        },
-                      ),
-                      const SizedBox(height: 22),
-                      BalanceCard(
-                        currentBalance: summary.currentBalance,
-                        totalIncome: summary.totalIncome,
-                        totalExpenses: summary.totalExpenses,
-                        chartBars: summary.chartBars,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AnalyticsView(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 18),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: smallCardHeight,
-                              child: BudgetCard(
-                                budgetSummary: summary.budgetSummary,
-                                onTap: showBudgetBottomSheet,
-                              ),
+                    )
+                  : summary == null
+                      ? const Center(
+                          child: Text(
+                            'No hay información para mostrar.',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: SizedBox(
-                              height: smallCardHeight,
-                              child: CategoryChartCard(
-                                items: summary.categoryExpenses,
-                                onTap: () {
-                                  AppSnackbar.info(
-                                    context,
-                                    'Pronto verás los gastos por categoría.',
-                                  );
+                        )
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(
+                            20,
+                            14,
+                            20,
+                            quickActionsReservedSpace,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DashboardHeader(
+                                appTitle: 'finBrain',
+                                userName: dashboardController.displayName,
+                                photoUrl: summary.photoUrl,
+                                onLogout: () async {
+                                  await dashboardController.signOut();
                                 },
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: smallCardHeight,
-                              child: CardsSummaryCard(
-                                cardsCount: summary.cardsCount,
+                              const SizedBox(height: 22),
+                              BalanceCard(
+                                currentBalance: summary.currentBalance,
+                                totalIncome: summary.totalIncome,
+                                totalExpenses: summary.totalExpenses,
+                                chartBars: summary.chartBars,
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const CardsView(),
+                                      builder: (_) => const AnalyticsView(),
                                     ),
                                   );
                                 },
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: SizedBox(
-                              height: smallCardHeight,
-                              child: AlertsCard(
-                                alerts: summary.alerts,
-                                onTap: () {
-                                  AppSnackbar.info(
-                                    context,
-                                    'Pronto verás todas tus alertas.',
-                                  );
-                                },
+                              const SizedBox(height: 18),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: smallCardHeight,
+                                      child: BudgetCard(
+                                        budgetSummary: summary.budgetSummary,
+                                        onTap: showBudgetBottomSheet,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: smallCardHeight,
+                                      child: CategoryChartCard(
+                                        items: summary.categoryExpenses,
+                                        onTap: () {
+                                          AppSnackbar.info(
+                                            context,
+                                            'Pronto verás los gastos por categoría.',
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                              const SizedBox(height: 14),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: smallCardHeight,
+                                      child: CardsSummaryCard(
+                                        cardsCount: summary.cardsCount,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const CardsView(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: smallCardHeight,
+                                      child: AlertsCard(
+                                        alerts: summary.alerts,
+                                        onTap: () {
+                                          AppSnackbar.info(
+                                            context,
+                                            'Pronto verás todas tus alertas.',
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                        ),
         ),
       ),
       bottomNavigationBar: Container(
@@ -702,23 +760,9 @@ class _DashboardViewState extends State<DashboardView> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
             child: QuickActionsBar(
               actions: dashboardController.quickActions,
+              selectedActionId: selectedActionId,
               onActionTap: (action) {
-                switch (action.id) {
-                  case 'expense':
-                    showTransactionBottomSheet(type: 'expense');
-                    break;
-                  case 'income':
-                    showTransactionBottomSheet(type: 'income');
-                    break;
-                  case 'movements':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const MovementsView()),
-                    );
-                    break;
-                  default:
-                    AppSnackbar.info(context, 'Acción no disponible.');
-                }
+                handleQuickActionTap(action.id);
               },
             ),
           ),
@@ -749,9 +793,15 @@ class _DashboardField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+      style: const TextStyle(
+        color: AppColors.textPrimary,
+        fontSize: 14,
+      ),
       cursorColor: AppColors.primary,
-      decoration: dashboardInputDecoration(label: label, hintText: hintText),
+      decoration: dashboardInputDecoration(
+        label: label,
+        hintText: hintText,
+      ),
     );
   }
 }
@@ -763,22 +813,35 @@ InputDecoration dashboardInputDecoration({
   return InputDecoration(
     labelText: label,
     hintText: hintText,
-    labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-    hintStyle: TextStyle(color: Colors.white.withOpacity(0.36)),
+    labelStyle: const TextStyle(
+      color: AppColors.textSecondary,
+      fontSize: 13,
+    ),
+    hintStyle: TextStyle(
+      color: Colors.white.withOpacity(0.36),
+    ),
     filled: true,
     fillColor: AppColors.cardSoft,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 18,
+    ),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
       borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
-      borderSide: BorderSide(color: Colors.white.withOpacity(0.06)),
+      borderSide: BorderSide(
+        color: Colors.white.withOpacity(0.06),
+      ),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
-      borderSide: const BorderSide(color: AppColors.primary, width: 1.3),
+      borderSide: const BorderSide(
+        color: AppColors.primary,
+        width: 1.3,
+      ),
     ),
   );
 }
