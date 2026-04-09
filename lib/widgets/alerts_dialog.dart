@@ -167,57 +167,6 @@ class _AlertsDialogState extends State<AlertsDialog> {
                 ),
               ),
 
-              // ── Date Filter Chips ─────────────────────────
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: AlertDateFilter.values.map((f) {
-                    final selected = _filter == f;
-                    final label = switch (f) {
-                      AlertDateFilter.today => 'Hoy',
-                      AlertDateFilter.week => 'Esta semana',
-                      AlertDateFilter.month => 'Este mes',
-                      AlertDateFilter.all => 'Todas',
-                    };
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _filter = f),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? AppColors.primary
-                                : AppColors.cardSoft,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: selected
-                                  ? AppColors.primary
-                                  : Colors.white.withOpacity(0.08),
-                            ),
-                          ),
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              color: selected
-                                  ? const Color(0xFF0B1418)
-                                  : AppColors.textSecondary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
               const SizedBox(height: 14),
 
               // ── Alert List ────────────────────────────────
