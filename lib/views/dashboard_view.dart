@@ -9,6 +9,7 @@ import '../views/balance_general_sheet_view.dart';
 import '../views/cards_view.dart';
 import '../views/movements_sheet_view.dart';
 import '../widgets/alerts_card.dart';
+import '../widgets/alerts_dialog.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/budget_card.dart';
 import '../widgets/cards_summary_card.dart';
@@ -27,7 +28,7 @@ class _DashboardViewState extends State<DashboardView> {
   final dashboardController = DashboardController();
   final transactionService = TransactionService();
 
-  static const double smallCardHeight = 200;
+  static const double smallCardHeight = 210;
   static const double quickActionsReservedSpace = 120;
 
   String selectedActionId = '';
@@ -728,9 +729,9 @@ class _DashboardViewState extends State<DashboardView> {
                                       child: AlertsCard(
                                         alerts: summary.alerts,
                                         onTap: () {
-                                          AppSnackbar.info(
+                                          AlertsDialog.show(
                                             context,
-                                            'Pronto verás todas tus alertas.',
+                                            alerts: summary.alerts,
                                           );
                                         },
                                       ),
