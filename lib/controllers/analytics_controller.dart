@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import '../models/category_expense_model.dart';
 import '../models/transaction_model.dart';
 
 class AnalyticsController {
@@ -29,6 +30,8 @@ class AnalyticsController {
   List<double> monthlyNetValues = [];
   List<double> monthlyExpenseValues = [];
   List<String> monthLabels = [];
+
+  List<CategoryExpenseModel> categoryExpenses = [];
 
   int financialScore = 0;
   String financialLabel = 'Sin datos';
@@ -62,7 +65,8 @@ class AnalyticsController {
       final budgetMap =
           dashboardData['budgetSummary'] as Map<String, dynamic>? ?? {};
 
-      currentBalance = (dashboardData['currentBalance'] as num?)?.toDouble() ?? 0;
+      currentBalance =
+          (dashboardData['currentBalance'] as num?)?.toDouble() ?? 0;
       totalIncome = (dashboardData['totalIncome'] as num?)?.toDouble() ?? 0;
       totalExpenses = (dashboardData['totalExpenses'] as num?)?.toDouble() ?? 0;
 
@@ -70,6 +74,15 @@ class AnalyticsController {
       budgetSpent = (budgetMap['spentAmount'] as num?)?.toDouble() ?? 0;
       budgetAvailable = (budgetMap['availableAmount'] as num?)?.toDouble() ?? 0;
       budgetUsage = budgetTotal > 0 ? (budgetSpent / budgetTotal) : 0;
+
+      final rawCategoryExpenses =
+          dashboardData['categoryExpenses'] as List<dynamic>? ?? [];
+
+      categoryExpenses = rawCategoryExpenses
+          .map((item) => CategoryExpenseModel.fromMap(
+                Map<String, dynamic>.from(item as Map),
+              ))
+          .toList();
 
       final transactionsSnapshot = await firestore
           .collection('users')

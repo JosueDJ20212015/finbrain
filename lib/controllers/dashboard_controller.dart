@@ -6,10 +6,12 @@ import '../models/dashboard_summary_model.dart';
 import '../models/quick_action_model.dart';
 import '../services/auth_service.dart';
 import '../services/dashboard_service.dart';
+import 'analytics_controller.dart';
 
 class DashboardController {
   final DashboardService dashboardService = DashboardService();
   final AuthService authService = AuthService();
+  final AnalyticsController analyticsController = AnalyticsController();
 
   DashboardSummaryModel? summary;
   bool isLoading = true;

@@ -7,6 +7,7 @@ import '../utils/app_snackbar.dart';
 import '../views/analytics_view.dart';
 import '../views/balance_general_sheet_view.dart';
 import '../views/cards_view.dart';
+import '../views/category_selection_view.dart';
 import '../views/movements_sheet_view.dart';
 import '../widgets/alerts_card.dart';
 import '../widgets/alerts_dialog.dart';
@@ -692,9 +693,15 @@ class _DashboardViewState extends State<DashboardView> {
                                       child: CategoryChartCard(
                                         items: summary.categoryExpenses,
                                         onTap: () {
-                                          AppSnackbar.info(
+                                          Navigator.push(
                                             context,
-                                            'Pronto verás los gastos por categoría.',
+                                            MaterialPageRoute(
+                                              builder: (_) => CategorySelectionView(
+                                                analyticsController:
+                                                    dashboardController
+                                                        .analyticsController,
+                                              ),
+                                            ),
                                           );
                                         },
                                       ),
