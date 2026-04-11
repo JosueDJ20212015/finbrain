@@ -34,29 +34,49 @@ class _CategoryExpensesDetailViewState
     _loadCategoryExpenses();
   }
 
+  String _normalizeText(String value) {
+    return value
+        .toLowerCase()
+        .trim()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ñ', 'n');
+  }
+
   Future<void> _loadCategoryExpenses() async {
     setState(() {
       isLoading = true;
+      categoryTransactions = [];
+      categoryPurchases = [];
+      totalAmount = 0;
     });
 
     try {
-      await widget.analyticsController.loadAnalytics(() {});
-
       final uid = widget.analyticsController.auth.currentUser?.uid;
       if (uid != null) {
+        final targetCategory = _normalizeText(widget.categoryName);
+
+        // 1) Traer TODAS las transacciones y filtrar localmente
         final transactionsSnapshot = await widget.analyticsController.firestore
             .collection('users')
             .doc(uid)
             .collection('transactions')
-            .where('type', isEqualTo: 'expense')
-            .where('category', isEqualTo: widget.categoryName)
-            .orderBy('date', descending: true)
             .get();
 
-        categoryTransactions = transactionsSnapshot.docs.map((doc) {
+        final allTransactions = transactionsSnapshot.docs.map((doc) {
           return TransactionModel.fromMap(doc.data(), id: doc.id);
         }).toList();
 
+        categoryTransactions = allTransactions.where((transaction) {
+          final transactionCategory = _normalizeText(transaction.category);
+          return transaction.isExpense && transactionCategory == targetCategory;
+        }).toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
+
+        // 2) Compras de tarjeta: intento flexible por título/notas
         final cardsSnapshot = await widget.analyticsController.firestore
             .collection('users')
             .doc(uid)
@@ -66,10 +86,8 @@ class _CategoryExpensesDetailViewState
         for (final cardDoc in cardsSnapshot.docs) {
           final card = CreditCardModel.fromMap(cardDoc.data(), id: cardDoc.id);
 
-          final purchasesSnapshot = await cardDoc.reference
-              .collection('purchases')
-              .orderBy('purchaseDate', descending: true)
-              .get();
+          final purchasesSnapshot =
+              await cardDoc.reference.collection('purchases').get();
 
           for (final purchaseDoc in purchasesSnapshot.docs) {
             final purchase = CardPurchaseModel.fromMap(
@@ -77,8 +95,10 @@ class _CategoryExpensesDetailViewState
               id: purchaseDoc.id,
             );
 
-            if ((purchase.title.toLowerCase())
-                .contains(widget.categoryName.toLowerCase())) {
+            final title = _normalizeText(purchase.title);
+            final notes = _normalizeText(purchase.notes);
+
+            if (title.contains(targetCategory) || notes.contains(targetCategory)) {
               categoryPurchases.add(
                 CardPurchaseWithCard(
                   purchase: purchase,
@@ -89,6 +109,10 @@ class _CategoryExpensesDetailViewState
           }
         }
 
+        categoryPurchases.sort(
+          (a, b) => b.purchase.purchaseDate.compareTo(a.purchase.purchaseDate),
+        );
+
         totalAmount = categoryTransactions.fold<double>(
               0,
               (sum, transaction) => sum + transaction.amount,
@@ -98,7 +122,9 @@ class _CategoryExpensesDetailViewState
               (sum, item) => sum + item.purchase.amount,
             );
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error cargando detalle de categoría: $e');
+    }
 
     if (!mounted) {
       return;
@@ -119,8 +145,6 @@ class _CategoryExpensesDetailViewState
 
   @override
   Widget build(BuildContext context) {
-    final totalEntries = categoryTransactions.length + categoryPurchases.length;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -224,7 +248,7 @@ class _CategoryExpensesDetailViewState
                               Expanded(
                                 child: _DetailMiniStat(
                                   title: 'Movimientos',
-                                  value: '$totalEntries',
+                                  value: '${categoryTransactions.length}',
                                   valueColor: AppColors.primarySoft,
                                 ),
                               ),

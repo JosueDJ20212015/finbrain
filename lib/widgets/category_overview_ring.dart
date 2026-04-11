@@ -30,7 +30,7 @@ class CategoryOverviewRing extends StatelessWidget {
       builder: (context, constraints) {
         final size = math.min(constraints.maxWidth, 360.0);
         final centerSize = size * 0.50;
-        final orbitRadius = size * 0.38;
+        final orbitRadius = size * 0.40;
         final itemCount = visibleItems.length;
 
         return SizedBox(
@@ -170,8 +170,8 @@ class _CategoryOrbitItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 54,
-            height: 54,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: color.withOpacity(0.18),
@@ -195,7 +195,7 @@ class _CategoryOrbitItem extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            width: 88,
+            width: 92,
             child: Text(
               category.name,
               maxLines: 1,
@@ -210,7 +210,7 @@ class _CategoryOrbitItem extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           SizedBox(
-            width: 88,
+            width: 92,
             child: Text(
               formatMoney(category.amount),
               maxLines: 1,
