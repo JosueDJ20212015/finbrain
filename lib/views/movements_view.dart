@@ -85,12 +85,12 @@ class _MovementsViewState extends State<MovementsView> {
     required String id,
     required String label,
   }) {
-    final isSelected = movementsController.selectedFilter == id;
+      final isSelected = movementsController.selectedTypeFilter == id;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          movementsController.applyFilter(id);
+          movementsController.applyTypeFilter(id);
         });
       },
       child: AnimatedContainer(
