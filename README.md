@@ -19,15 +19,3 @@ cd finbrain
 flutter pub get
 flutter run
 ```
-
-## IMPORTANTE
-
-Cada miembro debe agregar su SHA1 en Firebase
-
-Comando para obtener SHA1 desde la terminal de windows:
-
-```cmd
-keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android
-```
-
-Luego agregar en Firebase → Project settings → Android → Add SHA1
